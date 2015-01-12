@@ -35,20 +35,6 @@ private var snap = false;
 private var controller : ThirdPersonController;
 private var targetHeight = 100000.0; 
 
-// CAMERA MOUSE LOOK
-public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 };
-public var axes : RotationAxes = RotationAxes.MouseXAndY;
-public var sensitivityX = 15F;
-public var sensitivityY = 15F;
-
-public var minimumX = -360F;
-public var maximumX = 360F;
-
-public var minimumY = -60F;
-public var maximumY = 60F;
-
-var rotationY = 0F;
-
 function Awake ()
 {
 	offX = new Vector3(0, height, distance);
@@ -76,13 +62,8 @@ function Awake ()
 	else
 		Debug.Log("Please assign a target to the camera that has a ThirdPersonController script attached.");
 
-	SnapToCharacter();
+	
 	Cut(_target, centerOffset);
-}
-
-function SnapToCharacter()
-{
-	cameraTransform.LookAt(_target);
 }
 
 function DebugDrawStuff ()
@@ -176,33 +157,6 @@ function Apply ()
 	
 	var movement = false;
 	var targetPosition = _target.position + _target.up * distanceUp - _target.forward * distance;
-	cameraTransform.position = targetPosition;
-	//cameraTransform.LookAt(transform.position);
-	
-	if (axes == RotationAxes.MouseXAndY)
-	{
-		var rotationX = cameraTransform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityX;
-		
-		rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
-		rotationY = Mathf.Clamp (rotationY, minimumY, maximumY);
-		
-		cameraTransform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
-	}
-	else if (axes == RotationAxes.MouseX)
-	{
-		cameraTransform.Rotate(0, Input.GetAxis("Mouse X") * sensitivityX, 0);
-	}
-	else
-	{
-		rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
-		rotationY = Mathf.Clamp (rotationY, minimumY, maximumY);
-		
-		cameraTransform.localEulerAngles = new Vector3(-rotationY, cameraTransform.localEulerAngles.y, 0);
-	}
-	
-	
-	
-	/*
 	var floor : RaycastHit;
 	if(Input.GetKey(KeyCode.RightArrow))
 	{
@@ -214,7 +168,7 @@ function Apply ()
 	}
 	if(Input.GetKey(KeyCode.DownArrow))
 	{
-	
+	/*
 	     if (Physics.Raycast(cameraTransform.position, Vector3.down, floor, 0.8f))
 	     {
 	     	offX = Quaternion.AngleAxis(speed * 2, Vector3.left) * offX;
@@ -223,7 +177,7 @@ function Apply ()
 	     {
 	     	offX = Quaternion.AngleAxis(speed, Vector3.right) * offX;
 	     }
-	     
+	     */
 	     offX = Quaternion.AngleAxis(speed, Vector3.left) * offX;
 	}
 	if(Input.GetKey(KeyCode.UpArrow))
@@ -235,19 +189,20 @@ function Apply ()
 	    else
 	    {
 	    	offX = Quaternion.AngleAxis(speed, Vector3.left) * offX;
-	    }
+	    }*/
 	    offX = Quaternion.AngleAxis(speed, Vector3.left) * offX;
 	}
-	 var hit : RaycastHit;
+	cameraTransform.position = _target.position + offX;
+	
+	cameraTransform.LookAt(transform.position);
+	
+	 /*var hit : RaycastHit;
      if (Physics.Raycast(cameraTransform.position, _target.position - cameraTransform.position, hit, distance*0.90))
      {
      	Debug.Log("infront of camera");
      }
      Debug.DrawRay (cameraTransform.position, (_target.position - cameraTransform.position) * (distance/4), Color.green);
-	
-	cameraTransform.position = _target.position + offX;*/
-	
-	
+	*/
 	//cameraTransform.Translate(directionVec * speed * Time.deltaTime);
 	//cameraTransform.position = new Vector3(cameraTransform.position.x,cameraTransform.position.y, _target.position.z - distance);
 	// Set the height of the camera
