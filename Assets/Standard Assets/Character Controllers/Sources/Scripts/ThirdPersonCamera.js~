@@ -47,7 +47,9 @@ public var maximumX = 360F;
 public var minimumY = -60F;
 public var maximumY = 60F;
 
+var rotationX = 0F;
 var rotationY = 0F;
+private var originalRotation : Quaternion;
 
 function Awake ()
 {
@@ -61,6 +63,7 @@ function Awake ()
 			
 		
 	_target = transform;
+	originalRotation = cameraTransform.localRotation;
 	if (_target)
 	{
 		controller = _target.GetComponent(ThirdPersonController);
@@ -80,7 +83,7 @@ function Awake ()
 	Cut(_target, centerOffset);
 }
 
-function SnapToCharacter ()
+function SnapToCharacter()
 {
 	cameraTransform.LookAt(_target);
 }
@@ -177,27 +180,44 @@ function Apply ()
 	var movement = false;
 	var targetPosition = _target.position + _target.up * distanceUp - _target.forward * distance;
 	cameraTransform.position = targetPosition;
+	var newMaxX = ClampAngle(_target.localEulerAngles.y + maximumX, -360, 360);
+	var newMinX = ClampAngle(_target.localEulerAngles.y - maximumX, -360, 360);
+	Debug.Log(newMaxX + "+" + newMinX);
+	if(newMinX > newMaxX)
+	{
+		newMaxX = newMinX;
+		newMinX = newMaxX;
+	}
+	//cameraTransform.Rotate(new Vector3(0, _target.rotation.y, 0));
 	//cameraTransform.LookAt(transform.position);
 	
-	if (axes == RotationAxes.MouseXAndY)
-	{
-		var rotationX = cameraTransform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityX;
-		
+	if (axes == RotationAxes.MouseXAndY) {
+		rotationX += Input.GetAxis("Mouse X") * sensitivityX;
 		rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
-		rotationY = Mathf.Clamp (rotationY, minimumY, maximumY);
+
+		rotationX = ClampAngle (rotationX, newMinX, newMaxX);
+		rotationY = ClampAngle (rotationY, minimumY, maximumY);
 		
-		cameraTransform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
+		var xQuaternion = Quaternion.AngleAxis (rotationX, Vector3.up);
+		var yQuaternion = Quaternion.AngleAxis (rotationY, Vector3.left);
+		
+		cameraTransform.localRotation = originalRotation * xQuaternion * yQuaternion;
 	}
-	else if (axes == RotationAxes.MouseX)
+	else if (axes == RotationAxes.MouseX) 
 	{
-		cameraTransform.Rotate(0, Input.GetAxis("Mouse X") * sensitivityX, 0);
+		rotationX += Input.GetAxis("Mouse X") * sensitivityX;
+		rotationX = ClampAngle (rotationX, newMinX, newMaxX);
+
+		xQuaternion = Quaternion.AngleAxis (rotationX, Vector3.up);
+		cameraTransform.localRotation = originalRotation * xQuaternion;
 	}
-	else
+	else 
 	{
 		rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
-		rotationY = Mathf.Clamp (rotationY, minimumY, maximumY);
-		
-		cameraTransform.localEulerAngles = new Vector3(-rotationY, cameraTransform.localEulerAngles.y, 0);
+		rotationY = ClampAngle (rotationY, minimumY, maximumY);
+
+		yQuaternion = Quaternion.AngleAxis (rotationY, Vector3.left);
+		cameraTransform.localRotation = originalRotation * yQuaternion;
 	}
 	
 	
@@ -322,6 +342,14 @@ function SetUpRotation (centerPos : Vector3, headPos : Vector3)
 		extraLookAngle = extraLookAngle - centerToTopAngle;
 		//cameraTransform.rotation *= Quaternion.Euler(-extraLookAngle, 0, 0);
 	}
+}
+
+static function ClampAngle (angle : float, min : float, max : float) : float {
+	if (angle < -360.0)
+		angle += 360.0;
+	if (angle > 360.0)
+		angle -= 360.0;
+	return Mathf.Clamp (angle, min, max);
 }
 
 function GetCenterOffset ()
