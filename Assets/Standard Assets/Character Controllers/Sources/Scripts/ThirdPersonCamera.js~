@@ -3,6 +3,7 @@
 */
 
 var cameraTransform : Transform;
+var characterHead: Transform;
 private var _target : Transform;
 
 // The distance in the x-z plane to the target
@@ -134,7 +135,7 @@ function Apply ()
 		//currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, angleVelocity, snapSmoothLag, snapMaxSpeed);
 	}
 	// Normal camera motion
-	else
+	/*else
 	{
 		if (controller.GetLockCameraTimer () < lockCameraTimeout)
 		{
@@ -147,7 +148,7 @@ function Apply ()
 			targetAngle += 180;
 
 		currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, angleVelocity, angularSmoothLag, angularMaxSpeed);
-	}
+	}*/
 
 
 	// When jumping don't move camera upwards but only down!
@@ -185,8 +186,9 @@ function Apply ()
 	Debug.Log(newMaxX + "+" + newMinX);
 	if(newMinX > newMaxX)
 	{
+		var tmp = newMaxX;
 		newMaxX = newMinX;
-		newMinX = newMaxX;
+		newMinX = tmp;
 	}
 	//cameraTransform.Rotate(new Vector3(0, _target.rotation.y, 0));
 	//cameraTransform.LookAt(transform.position);
@@ -219,8 +221,10 @@ function Apply ()
 		yQuaternion = Quaternion.AngleAxis (rotationY, Vector3.left);
 		cameraTransform.localRotation = originalRotation * yQuaternion;
 	}
-	
-	
+	if(characterHead)
+	{
+		characterHead.localRotation = cameraTransform.localRotation;
+	}
 	
 	/*
 	var floor : RaycastHit;
