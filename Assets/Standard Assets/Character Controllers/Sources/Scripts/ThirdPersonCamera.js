@@ -46,11 +46,15 @@ public var maximumX = 30F;
 
 public var minimumY = -60F;
 public var maximumY = 60F;
+public var bodyRange = 45F;
 
-var rotationX = 0F;
-var rotationY = 0F;
+private var rotationX = 0F;
+private var headRotationX = 0F;
+private var rotationY = 0F;
 private var originalRotation : Quaternion;
 private var originalRotationHead : Quaternion;
+private var overlapLeft : boolean = false;
+private var overlapRight : boolean = false;
 
 function Awake ()
 {
@@ -153,32 +157,55 @@ function Apply ()
     var newMaxX = 0;
     var newMinX = 0; 
 
-    if(eulerTargetY > 180)
+    var left = Input.GetAxisRaw("Horizontal") == -1 ? true : false;
+    
+    if(eulerTargetY >= 180)
     {
         var adjustedEuler = eulerTargetY - 360;
         newMaxX = adjustedEuler + maximumX;
         newMinX = adjustedEuler - maximumX;
+        if(overlapRight)
+        {
+            overlapRight = false;
+            if(!left)
+            {
+                rotationX = -209;
+            }
+        }
+        overlapLeft = true;
     }
     else
     {
         newMaxX = eulerTargetY + maximumX;
         newMinX = eulerTargetY - maximumX;
+        if(overlapLeft)
+        {
+            overlapLeft = false;
+            if(left)
+            {
+                rotationX = 209;
+            }
+        }
+        overlapRight = true;
     }
 
     var xQuaternion = Quaternion.AngleAxis (rotationX, Vector3.up);
     var yQuaternion = Quaternion.AngleAxis (rotationY, Vector3.left);
-    var xQuaternionHead = Quaternion.AngleAxis (rotationY, Vector3.up);
-    var yQuaternionHead = Quaternion.AngleAxis (rotationX, Vector3.left);
+    var yQuaternionHead = Quaternion.AngleAxis (rotationY, Vector3.up);
+    var zQuaternionHead = Quaternion.AngleAxis (headRotationX, Vector3.forward);
+    var oldRotationX : float = rotationX;
     rotationX += Input.GetAxis("Mouse X") * sensitivityX;
     rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
+    headRotationX += Input.GetAxis("Mouse X") * sensitivityX;
     rotationY = ClampAngle (rotationY, minimumY, maximumY);
     rotationX = ClampAngle (rotationX, newMinX, newMaxX);
+    headRotationX = ClampAngle(headRotationX, -bodyRange, bodyRange);
 
     if (axes == RotationAxes.MouseXAndY) {
         cameraTransform.localRotation = originalRotation * xQuaternion * yQuaternion;
         if(characterHead)
         {
-            characterHead.localRotation = originalRotationHead * xQuaternionHead * yQuaternionHead;
+            characterHead.localRotation = originalRotationHead * yQuaternionHead * zQuaternionHead;
         }
     }
     else if (axes == RotationAxes.MouseX) 
@@ -186,7 +213,7 @@ function Apply ()
         cameraTransform.localRotation = originalRotation * xQuaternion;
         if(characterHead)
         {
-            characterHead.localRotation = originalRotationHead * xQuaternionHead;
+            characterHead.localRotation = originalRotationHead * zQuaternionHead;
         }
     }
     else 
@@ -199,7 +226,7 @@ function Apply ()
     }
 }
 
-function LateUpdate () {
+function FixedUpdate () {
     Apply();
 }
 

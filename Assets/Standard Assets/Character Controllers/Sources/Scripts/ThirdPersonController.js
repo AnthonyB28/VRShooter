@@ -281,7 +281,7 @@ function DidJump ()
 	_characterState = CharacterState.Jumping;
 }
 
-function Update() {
+function FixedUpdate() {
 	
 	if (!isControllable)
 	{
