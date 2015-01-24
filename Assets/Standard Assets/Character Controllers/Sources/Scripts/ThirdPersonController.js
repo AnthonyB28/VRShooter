@@ -17,6 +17,9 @@ public var runMaxAnimationSpeed : float = 1.0;
 public var jumpAnimationSpeed : float = 1.15;
 public var landAnimationSpeed : float = 1.0;
 
+public var upSpeed : float = 2f;
+public var downSpeed : float = -2f;
+
 private var _animation : Animation;
 
 enum CharacterState {
@@ -245,10 +248,6 @@ function ApplyGravity ()
 {
 	if (isControllable)	// don't move player at all if not controllable.
 	{
-		// Apply gravity
-		var jumpButton = Input.GetButton("Jump");
-		
-		
 		// When we reach the apex of the jump we send out a message
 		if (jumping && !jumpingReachedApex && verticalSpeed <= 0.0)
 		{
@@ -292,6 +291,19 @@ function FixedUpdate() {
 	if (Input.GetButtonDown ("Jump"))
 	{
 		lastJumpButtonTime = Time.time;
+	}
+
+	if(Input.GetButton("Jump"))
+	{
+	    inAirVelocity = new Vector3(0,upSpeed,0);
+	}
+	else if (Input.GetButton("Crouch"))
+	{
+	    inAirVelocity = new Vector3(0,downSpeed,0);
+	}
+	else
+	{
+	    inAirVelocity = Vector3.zero;
 	}
 
 	UpdateSmoothedMovementDirection();
