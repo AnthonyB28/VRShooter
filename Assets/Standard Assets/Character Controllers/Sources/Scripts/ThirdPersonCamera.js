@@ -97,6 +97,11 @@ function SnapToCharacter()
     cameraTransform.LookAt(_target);
 }
 
+function GetAngleTurned()
+{
+    return rotationX;
+}
+
 function DebugDrawStuff ()
 {
     Debug.DrawLine(_target.position, _target.position + headOffset);
@@ -154,10 +159,10 @@ function Apply ()
     var targetPosition = _target.position + _target.up * distanceUp - _target.forward * distance;
     cameraTransform.position = targetPosition;
     var eulerTargetY = _target.localEulerAngles.y;
-    var newMaxX = 0;
-    var newMinX = 0; 
+    var newMaxX = maximumX;
+    var newMinX = -maximumX; 
 
-    var left = Input.GetAxisRaw("Horizontal") == -1 ? true : false;
+    /*var left = Input.GetAxisRaw("Horizontal") == -1 ? true : false;
     
     if(eulerTargetY >= 180)
     {
@@ -187,7 +192,7 @@ function Apply ()
             }
         }
         overlapRight = true;
-    }
+    }*/
 
     var xQuaternion = Quaternion.AngleAxis (rotationX, Vector3.up);
     var yQuaternion = Quaternion.AngleAxis (rotationY, Vector3.left);
@@ -198,6 +203,7 @@ function Apply ()
     rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
     headRotationX += Input.GetAxis("Mouse X") * sensitivityX;
     rotationY = ClampAngle (rotationY, minimumY, maximumY);
+    //rotationX = ClampAngle (rotationX, newMinX, newMaxX);
     rotationX = ClampAngle (rotationX, newMinX, newMaxX);
     headRotationX = ClampAngle(headRotationX, -bodyRange, bodyRange);
 
@@ -205,7 +211,7 @@ function Apply ()
         cameraTransform.localRotation = originalRotation * xQuaternion * yQuaternion;
         if(characterHead)
         {
-            characterHead.localRotation = originalRotationHead * yQuaternionHead * zQuaternionHead;
+            characterHead.localRotation = originalRotationHead * yQuaternion * xQuaternion;
         }
     }
     else if (axes == RotationAxes.MouseX) 
@@ -213,7 +219,7 @@ function Apply ()
         cameraTransform.localRotation = originalRotation * xQuaternion;
         if(characterHead)
         {
-            characterHead.localRotation = originalRotationHead * zQuaternionHead;
+            characterHead.localRotation = originalRotationHead * yQuaternion;
         }
     }
     else 
@@ -221,7 +227,7 @@ function Apply ()
         cameraTransform.localRotation = originalRotation * yQuaternion;
         if(characterHead)
         {
-            characterHead.localRotation = originalRotationHead * yQuaternionHead;
+            characterHead.localRotation = originalRotationHead * xQuaternion;
         }
     }
 }

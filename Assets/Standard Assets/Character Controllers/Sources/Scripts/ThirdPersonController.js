@@ -19,7 +19,7 @@ public var landAnimationSpeed : float = 1.0;
 
 public var upSpeed : float = 2f;
 public var downSpeed : float = -2f;
-
+private var aim : float = 0f;
 private var _animation : Animation;
 
 enum CharacterState {
@@ -133,10 +133,9 @@ public var jumpPoseAnimation : AnimationClip;
 
 function UpdateSmoothedMovementDirection ()
 {
-	var cameraTransform = Camera.main.transform;
+	//var cameraTransform = Camera.main.transform;
 	var grounded = IsGrounded();
 	
-	// Forward vector relative to the camera along the x-z plane	
 	var forward = this.transform.TransformDirection(Vector3.forward);
 	forward.y = 0;
 	forward = forward.normalized;
@@ -150,13 +149,18 @@ function UpdateSmoothedMovementDirection ()
 
 	// Are we moving backwards or looking backwards
 	if (v < -0.2)
-		movingBack = true;
-	else
-		movingBack = false;
+	{
+	    movingBack = true;
+	}
+	else if( (v > 0 || h > 0 || h < 0) && !isMoving)
+	{
+	    movingBack = false;
+	    moveDirection = Vector3.zero;
+	}
 	
 	var wasMoving = isMoving;
 	isMoving = Mathf.Abs (h) > 0.1 || Mathf.Abs (v) > 0.1;
-		
+
 	// Target direction relative to the camera
 	var targetDirection = h * right + v * forward;
 	
@@ -173,9 +177,16 @@ function UpdateSmoothedMovementDirection ()
 		// moveDirection is always normalized, and we only update it if there is user input.
 		if (targetDirection != Vector3.zero)
 		{
-				moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
-				
-				moveDirection = moveDirection.normalized;
+		    if(!movingBack)
+		    {
+		        moveDirection = Vector3.RotateTowards(moveDirection, targetDirection, rotateSpeed * Mathf.Deg2Rad * Time.deltaTime, 1000);
+		        moveDirection = moveDirection.normalized;
+		    }
+		    else
+		    {
+		        moveDirection = targetDirection;
+		        moveDirection = moveDirection.normalized;
+		    }
 		}
 		
 		// Smooth the speed based on the current target direction
@@ -362,14 +373,21 @@ function FixedUpdate() {
 			}
 		}
 	}
-	// ANIMATION sector
-	
 	// Set rotation to the move direction
 	if (IsGrounded())
 	{
-		
-		transform.rotation = Quaternion.LookRotation(moveDirection);
-			
+	    if(!movingBack)
+	    {	
+	        if (Input.GetKey (KeyCode.LeftShift) || Input.GetKey (KeyCode.RightShift))
+	        {
+	        }
+	        else
+	        {
+	            var lookDirection = Vector3.RotateTowards(transform.forward, moveDirection, 5 * Time.deltaTime, 0.0);
+	            Debug.DrawRay(transform.position, lookDirection, Color.red);
+	            //transform.rotation = Quaternion.LookRotation(lookDirection); 
+	        }
+	    }
 	}	
 	else
 	{
