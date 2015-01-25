@@ -109,160 +109,160 @@ function DebugDrawStuff ()
 }
 
 function AngleDistance (a : float, b : float)
-{
-    a = Mathf.Repeat(a, 360);
-    b = Mathf.Repeat(b, 360);
-	
-    return Mathf.Abs(b - a);
-}
-
-function Apply ()
-{
-    // Early out if we don't have a target
-    if (!controller)
-        return;
-	
-    var targetCenter = _target.position + centerOffset;
-    var targetHead = _target.position + headOffset;
-
-    //	DebugDrawStuff();
-
-    // Calculate the current & target rotation angles
-    var originalTargetAngle = _target.eulerAngles.y;
-    var currentAngle = cameraTransform.eulerAngles.y;
-
-    // Adjust real target angle when camera is locked
-    var targetAngle = originalTargetAngle; 
-
-    // When jumping don't move camera upwards but only down!
-    if (controller.IsJumping ())
     {
-        // We'd be moving the camera upwards, do that only if it's really high
-        var newTargetHeight = targetCenter.y + height;
-        if (newTargetHeight < targetHeight || newTargetHeight - targetHeight > 5)
+        a = Mathf.Repeat(a, 360);
+        b = Mathf.Repeat(b, 360);
+	
+        return Mathf.Abs(b - a);
+    }
+
+    function Apply ()
+    {
+        // Early out if we don't have a target
+        if (!controller)
+            return;
+	
+        var targetCenter = _target.position + centerOffset;
+        var targetHead = _target.position + headOffset;
+
+        //	DebugDrawStuff();
+
+        // Calculate the current & target rotation angles
+        var originalTargetAngle = _target.eulerAngles.y;
+        var currentAngle = cameraTransform.eulerAngles.y;
+
+        // Adjust real target angle when camera is locked
+        var targetAngle = originalTargetAngle; 
+
+        // When jumping don't move camera upwards but only down!
+        if (controller.IsJumping ())
+        {
+            // We'd be moving the camera upwards, do that only if it's really high
+            var newTargetHeight = targetCenter.y + height;
+            if (newTargetHeight < targetHeight || newTargetHeight - targetHeight > 5)
+                targetHeight = targetCenter.y + height;
+        }
+            // When walking always update the target height
+        else
+        {
             targetHeight = targetCenter.y + height;
-    }
-        // When walking always update the target height
-    else
-    {
-        targetHeight = targetCenter.y + height;
-    }
+        }
 
-    // Damp the height
-    var currentHeight = cameraTransform.position.y;
-    currentHeight = Mathf.SmoothDamp (currentHeight, targetHeight, heightVelocity, heightSmoothLag);
+        // Damp the height
+        var currentHeight = cameraTransform.position.y;
+        currentHeight = Mathf.SmoothDamp (currentHeight, targetHeight, heightVelocity, heightSmoothLag);
 
-    // Convert the angle into a rotation, by which we then reposition the camera
-    var currentRotation = Quaternion.Euler (0, currentAngle, 0);
+        // Convert the angle into a rotation, by which we then reposition the camera
+        var currentRotation = Quaternion.Euler (0, currentAngle, 0);
 	
-    var movement = false;
-    var targetPosition = _target.position + _target.up * distanceUp - _target.forward * distance;
-    cameraTransform.position = targetPosition;
-    var eulerTargetY = _target.localEulerAngles.y;
-    var newMaxX = maximumX;
-    var newMinX = -maximumX; 
+        var movement = false;
+        var targetPosition = _target.position + _target.up * distanceUp - _target.forward * distance;
+        cameraTransform.position = targetPosition;
+        var eulerTargetY = _target.localEulerAngles.y;
+        var newMaxX = maximumX;
+        var newMinX = -maximumX; 
 
-    /*var left = Input.GetAxisRaw("Horizontal") == -1 ? true : false;
-    
-    if(eulerTargetY >= 180)
-    {
-        var adjustedEuler = eulerTargetY - 360;
-        newMaxX = adjustedEuler + maximumX;
-        newMinX = adjustedEuler - maximumX;
-        if(overlapRight)
+        /*var left = Input.GetAxisRaw("Horizontal") == -1 ? true : false;
+        
+        if(eulerTargetY >= 180)
         {
-            overlapRight = false;
-            if(!left)
+            var adjustedEuler = eulerTargetY - 360;
+            newMaxX = adjustedEuler + maximumX;
+            newMinX = adjustedEuler - maximumX;
+            if(overlapRight)
             {
-                rotationX = -209;
+                overlapRight = false;
+                if(!left)
+                {
+                    rotationX = -209;
+                }
+            }
+            overlapLeft = true;
+        }
+        else
+        {
+            newMaxX = eulerTargetY + maximumX;
+            newMinX = eulerTargetY - maximumX;
+            if(overlapLeft)
+            {
+                overlapLeft = false;
+                if(left)
+                {
+                    rotationX = 209;
+                }
+            }
+            overlapRight = true;
+        }*/
+
+        var xQuaternion = Quaternion.AngleAxis (rotationX, Vector3.up);
+        var yQuaternion = Quaternion.AngleAxis (rotationY, Vector3.left);
+        var yQuaternionHead = Quaternion.AngleAxis (rotationY, Vector3.up);
+        var zQuaternionHead = Quaternion.AngleAxis (headRotationX, Vector3.forward);
+        var oldRotationX : float = rotationX;
+        rotationX += Input.GetAxis("Mouse X") * sensitivityX;
+        rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
+        headRotationX += Input.GetAxis("Mouse X") * sensitivityX;
+        rotationY = ClampAngle (rotationY, minimumY, maximumY);
+        //rotationX = ClampAngle (rotationX, newMinX, newMaxX);
+        rotationX = ClampAngle (rotationX, newMinX, newMaxX);
+        headRotationX = ClampAngle(headRotationX, -bodyRange, bodyRange);
+
+        if (axes == RotationAxes.MouseXAndY) {
+            cameraTransform.localRotation = originalRotation * xQuaternion * yQuaternion;
+            if(characterHead)
+            {
+                characterHead.localRotation = originalRotationHead * yQuaternion * xQuaternion;
             }
         }
-        overlapLeft = true;
-    }
-    else
-    {
-        newMaxX = eulerTargetY + maximumX;
-        newMinX = eulerTargetY - maximumX;
-        if(overlapLeft)
+        else if (axes == RotationAxes.MouseX) 
         {
-            overlapLeft = false;
-            if(left)
+            cameraTransform.localRotation = originalRotation * xQuaternion;
+            if(characterHead)
             {
-                rotationX = 209;
+                characterHead.localRotation = originalRotationHead * yQuaternion;
             }
         }
-        overlapRight = true;
-    }*/
-
-    var xQuaternion = Quaternion.AngleAxis (rotationX, Vector3.up);
-    var yQuaternion = Quaternion.AngleAxis (rotationY, Vector3.left);
-    var yQuaternionHead = Quaternion.AngleAxis (rotationY, Vector3.up);
-    var zQuaternionHead = Quaternion.AngleAxis (headRotationX, Vector3.forward);
-    var oldRotationX : float = rotationX;
-    rotationX += Input.GetAxis("Mouse X") * sensitivityX;
-    rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
-    headRotationX += Input.GetAxis("Mouse X") * sensitivityX;
-    rotationY = ClampAngle (rotationY, minimumY, maximumY);
-    //rotationX = ClampAngle (rotationX, newMinX, newMaxX);
-    rotationX = ClampAngle (rotationX, newMinX, newMaxX);
-    headRotationX = ClampAngle(headRotationX, -bodyRange, bodyRange);
-
-    if (axes == RotationAxes.MouseXAndY) {
-        cameraTransform.localRotation = originalRotation * xQuaternion * yQuaternion;
-        if(characterHead)
+        else 
         {
-            characterHead.localRotation = originalRotationHead * yQuaternion * xQuaternion;
+            cameraTransform.localRotation = originalRotation * yQuaternion;
+            if(characterHead)
+            {
+                characterHead.localRotation = originalRotationHead * xQuaternion;
+            }
         }
     }
-    else if (axes == RotationAxes.MouseX) 
-    {
-        cameraTransform.localRotation = originalRotation * xQuaternion;
-        if(characterHead)
-        {
-            characterHead.localRotation = originalRotationHead * yQuaternion;
-        }
+
+    function FixedUpdate () {
+        Apply();
     }
-    else 
-    {
-        cameraTransform.localRotation = originalRotation * yQuaternion;
-        if(characterHead)
+
+    function Cut (dummyTarget : Transform, dummyCenter : Vector3)
         {
-            characterHead.localRotation = originalRotationHead * xQuaternion;
+            var oldHeightSmooth = heightSmoothLag;
+            var oldSnapMaxSpeed = snapMaxSpeed;
+            var oldSnapSmooth = snapSmoothLag;
+	
+            snapMaxSpeed = 10000;
+            snapSmoothLag = 0.001;
+            heightSmoothLag = 0.001;
+	
+            snap = true;
+            Apply();
+	
+            heightSmoothLag = oldHeightSmooth;
+            snapMaxSpeed = oldSnapMaxSpeed;
+            snapSmoothLag = oldSnapSmooth;
         }
-    }
-}
 
-function FixedUpdate () {
-    Apply();
-}
+        static function ClampAngle (angle : float, min : float, max : float) : float {
+            if (angle < -360.0)
+                angle += 360.0;
+            if (angle > 360.0)
+                angle -= 360.0;
+            return Mathf.Clamp (angle, min, max);
+        }
 
-function Cut (dummyTarget : Transform, dummyCenter : Vector3)
-{
-    var oldHeightSmooth = heightSmoothLag;
-    var oldSnapMaxSpeed = snapMaxSpeed;
-    var oldSnapSmooth = snapSmoothLag;
-	
-    snapMaxSpeed = 10000;
-    snapSmoothLag = 0.001;
-    heightSmoothLag = 0.001;
-	
-    snap = true;
-    Apply();
-	
-    heightSmoothLag = oldHeightSmooth;
-    snapMaxSpeed = oldSnapMaxSpeed;
-    snapSmoothLag = oldSnapSmooth;
-}
-
-static function ClampAngle (angle : float, min : float, max : float) : float {
-    if (angle < -360.0)
-        angle += 360.0;
-    if (angle > 360.0)
-        angle -= 360.0;
-    return Mathf.Clamp (angle, min, max);
-}
-
-function GetCenterOffset ()
-{
-    return centerOffset;
-}
+            function GetCenterOffset ()
+            {
+                return centerOffset;
+            }
