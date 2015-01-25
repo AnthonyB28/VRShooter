@@ -4,8 +4,10 @@ using System.Collections;
 public class Rifle : WeaponBase
 {
 
-    public Rifle()
+    public Rifle(GameObject weapon, GameObject projectile)
     {
+        m_Weapon = weapon;
+        m_Projectile = projectile;
         m_AmmoClipMax = 7;
         m_AmmoClipCurrent = m_AmmoClipMax;
         m_AmmoReserveMax = 21;
@@ -44,12 +46,19 @@ public class Rifle : WeaponBase
             {
                 m_IsFiring = true;
                 --m_AmmoClipCurrent;
+                SpawnProjectile();
             }
             else
             {
                 Reload();
             }
         }
+    }
+
+    public override void SpawnProjectile()
+    {
+        Transform spawn = m_Weapon.transform.GetChild(0);
+        GameObject.Instantiate(m_Projectile, spawn.position, Camera.main.transform.rotation);
     }
 
     public override void Reload()
