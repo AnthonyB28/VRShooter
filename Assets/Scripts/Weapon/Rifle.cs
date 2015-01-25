@@ -28,7 +28,6 @@ public class Rifle : WeaponBase
         if(m_IsReloading)
         {
             m_ReloadTimeCurrent += Time.deltaTime;
-            Debug.Log(m_ReloadTimeCurrent);
             if(m_ReloadTimeCurrent >= m_ReloadTime)
             {
                 m_IsReloading = false;
@@ -44,7 +43,6 @@ public class Rifle : WeaponBase
             if (m_AmmoClipCurrent > 0)
             {
                 m_IsFiring = true;
-                Debug.Log("Firing rifle");
                 --m_AmmoClipCurrent;
             }
             else

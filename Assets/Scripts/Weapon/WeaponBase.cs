@@ -19,8 +19,8 @@ public abstract class WeaponBase
     abstract public void Fire();
     abstract public void Reload();
 
-    public virtual void SetSelected()
+    public virtual void SetSelected(bool select)
     {
-        m_IsSelected = true;
+        m_IsSelected = select;
     }
 }

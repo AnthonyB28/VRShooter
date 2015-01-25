@@ -20,7 +20,7 @@ public class WeaponSystem : MonoBehaviour
 
         if (m_ActiveWeapons.Count > 0)
         {
-            m_SelectedWeapon = m_ActiveWeapons[0];
+            SelectWeapon(m_ActiveWeapons[0]);
         }
     }
 
@@ -33,5 +33,19 @@ public class WeaponSystem : MonoBehaviour
         {
             m_SelectedWeapon.Fire();
         }
+        else if(Input.GetButton("Reload"))
+        {
+            m_SelectedWeapon.Reload();
+        }
+    }
+
+    void SelectWeapon(WeaponBase weapon)
+    {
+        if(m_SelectedWeapon != null)
+        {
+            m_SelectedWeapon.SetSelected(false);
+        }
+        m_SelectedWeapon = weapon;
+        weapon.SetSelected(true);
     }
 }
