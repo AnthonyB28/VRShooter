@@ -274,193 +274,193 @@ function ApplyGravity ()
 }
 
 function CalculateJumpVerticalSpeed (targetJumpHeight : float)
+{
+    // From the jump height and gravity we deduce the upwards speed 
+    // for the character to reach at the apex.
+    return Mathf.Sqrt(2 * targetJumpHeight * gravity);
+}
+
+function DidJump ()
+{
+    jumping = true;
+    jumpingReachedApex = false;
+    lastJumpTime = Time.time;
+    lastJumpStartHeight = transform.position.y;
+    lastJumpButtonTime = -10;
+	
+    _characterState = CharacterState.Jumping;
+}
+
+function FixedUpdate() {
+	
+    if (!isControllable)
     {
-        // From the jump height and gravity we deduce the upwards speed 
-        // for the character to reach at the apex.
-        return Mathf.Sqrt(2 * targetJumpHeight * gravity);
+        // kill all inputs if not controllable.
+        Input.ResetInputAxes();
     }
 
-    function DidJump ()
+    if (Input.GetButtonDown ("Jump"))
     {
-        jumping = true;
-        jumpingReachedApex = false;
-        lastJumpTime = Time.time;
-        lastJumpStartHeight = transform.position.y;
-        lastJumpButtonTime = -10;
-	
-        _characterState = CharacterState.Jumping;
+        lastJumpButtonTime = Time.time;
     }
 
-    function FixedUpdate() {
-	
-        if (!isControllable)
-        {
-            // kill all inputs if not controllable.
-            Input.ResetInputAxes();
-        }
+    if(Input.GetButton("Jump"))
+    {
+        inAirVelocity = new Vector3(0,upSpeed,0);
+    }
+    else if (Input.GetButton("Crouch"))
+    {
+        inAirVelocity = new Vector3(0,downSpeed,0);
+    }
+    else
+    {
+        inAirVelocity = Vector3.zero;
+    }
 
-        if (Input.GetButtonDown ("Jump"))
-        {
-            lastJumpButtonTime = Time.time;
-        }
+    UpdateSmoothedMovementDirection();
+	
+    // Apply gravity
+    // - extra power jump modifies gravity
+    // - controlledDescent mode modifies gravity
+    ApplyGravity ();
 
-        if(Input.GetButton("Jump"))
+    // Apply jumping logic
+    ApplyJumping ();
+	
+    // Calculate actual motion
+    var movement = moveDirection * moveSpeed + Vector3 (0, verticalSpeed, 0) + inAirVelocity;
+    movement *= Time.deltaTime;
+	
+    // Move the controller
+    var controller : CharacterController = GetComponent(CharacterController);
+    controller.Move(movement);
+    collisionFlags = CollisionFlags.Below; //controller.Move(movement);
+	
+    // ANIMATION sector
+    if(_animation) {
+        if(_characterState == CharacterState.Jumping) 
         {
-            inAirVelocity = new Vector3(0,upSpeed,0);
-        }
-        else if (Input.GetButton("Crouch"))
+            if(!jumpingReachedApex) {
+                _animation[jumpPoseAnimation.name].speed = jumpAnimationSpeed;
+                _animation[jumpPoseAnimation.name].wrapMode = WrapMode.ClampForever;
+                _animation.CrossFade(jumpPoseAnimation.name);
+            } else {
+                _animation[jumpPoseAnimation.name].speed = -landAnimationSpeed;
+                _animation[jumpPoseAnimation.name].wrapMode = WrapMode.ClampForever;
+                _animation.CrossFade(jumpPoseAnimation.name);				
+            }
+        } 
+        else 
         {
-            inAirVelocity = new Vector3(0,downSpeed,0);
-        }
-        else
-        {
-            inAirVelocity = Vector3.zero;
-        }
-
-        UpdateSmoothedMovementDirection();
-	
-        // Apply gravity
-        // - extra power jump modifies gravity
-        // - controlledDescent mode modifies gravity
-        ApplyGravity ();
-
-        // Apply jumping logic
-        ApplyJumping ();
-	
-        // Calculate actual motion
-        var movement = moveDirection * moveSpeed + Vector3 (0, verticalSpeed, 0) + inAirVelocity;
-        movement *= Time.deltaTime;
-	
-        // Move the controller
-        var controller : CharacterController = GetComponent(CharacterController);
-        controller.Move(movement);
-        collisionFlags = CollisionFlags.Below; //controller.Move(movement);
-	
-        // ANIMATION sector
-        if(_animation) {
-            if(_characterState == CharacterState.Jumping) 
-            {
-                if(!jumpingReachedApex) {
-                    _animation[jumpPoseAnimation.name].speed = jumpAnimationSpeed;
-                    _animation[jumpPoseAnimation.name].wrapMode = WrapMode.ClampForever;
-                    _animation.CrossFade(jumpPoseAnimation.name);
-                } else {
-                    _animation[jumpPoseAnimation.name].speed = -landAnimationSpeed;
-                    _animation[jumpPoseAnimation.name].wrapMode = WrapMode.ClampForever;
-                    _animation.CrossFade(jumpPoseAnimation.name);				
-                }
-            } 
+            if(controller.velocity.sqrMagnitude < 0.1) {
+                _animation.CrossFade(idleAnimation.name);
+            }
             else 
             {
-                if(controller.velocity.sqrMagnitude < 0.1) {
-                    _animation.CrossFade(idleAnimation.name);
+                if(_characterState == CharacterState.Running) {
+                    _animation[runAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0, runMaxAnimationSpeed);
+                    _animation.CrossFade(runAnimation.name);	
                 }
-                else 
-                {
-                    if(_characterState == CharacterState.Running) {
-                        _animation[runAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0, runMaxAnimationSpeed);
-                        _animation.CrossFade(runAnimation.name);	
-                    }
-                    else if(_characterState == CharacterState.Trotting) {
-                        _animation[walkAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0, trotMaxAnimationSpeed);
-                        _animation.CrossFade(walkAnimation.name);	
-                    }
-                    else if(_characterState == CharacterState.Walking) {
-                        _animation[walkAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0, walkMaxAnimationSpeed);
-                        _animation.CrossFade(walkAnimation.name);	
-                    }
+                else if(_characterState == CharacterState.Trotting) {
+                    _animation[walkAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0, trotMaxAnimationSpeed);
+                    _animation.CrossFade(walkAnimation.name);	
+                }
+                else if(_characterState == CharacterState.Walking) {
+                    _animation[walkAnimation.name].speed = Mathf.Clamp(controller.velocity.magnitude, 0.0, walkMaxAnimationSpeed);
+                    _animation.CrossFade(walkAnimation.name);	
+                }
 				
-                }
-            }
-        }
-        // Set rotation to the move direction
-        if (IsGrounded())
-        {
-            /*if(!movingBack)
-            {	
-                if (Input.GetKey (KeyCode.LeftShift) || Input.GetKey (KeyCode.RightShift))
-                {
-                }
-                else
-                {
-                    var lookDirection = Vector3.RotateTowards(transform.forward, moveDirection, 5 * Time.deltaTime, 0.0);
-                    Debug.DrawRay(transform.position, lookDirection, Color.red);
-                    transform.rotation = Quaternion.LookRotation(lookDirection); 
-                }
-            }*/
-        }	
-        else
-        {
-            var xzMove = movement;
-            xzMove.y = 0;
-            if (xzMove.sqrMagnitude > 0.001)
-            {
-                transform.rotation = Quaternion.LookRotation(xzMove);
-            }
-        }	
-	
-        // We are in jump mode but just became grounded
-        if (IsGrounded())
-        {
-            lastGroundedTime = Time.time;
-            inAirVelocity = Vector3.zero;
-            if (jumping)
-            {
-                jumping = false;
-                SendMessage("DidLand", SendMessageOptions.DontRequireReceiver);
             }
         }
     }
-
-    function OnControllerColliderHit (hit : ControllerColliderHit )
+    // Set rotation to the move direction
+    if (IsGrounded())
+    {
+        /*if(!movingBack)
+        {	
+            if (Input.GetKey (KeyCode.LeftShift) || Input.GetKey (KeyCode.RightShift))
+            {
+            }
+            else
+            {
+                var lookDirection = Vector3.RotateTowards(transform.forward, moveDirection, 5 * Time.deltaTime, 0.0);
+                Debug.DrawRay(transform.position, lookDirection, Color.red);
+                transform.rotation = Quaternion.LookRotation(lookDirection); 
+            }
+        }*/
+    }	
+    else
+    {
+        var xzMove = movement;
+        xzMove.y = 0;
+        if (xzMove.sqrMagnitude > 0.001)
         {
-            //	Debug.DrawRay(hit.point, hit.normal);
-            if (hit.moveDirection.y > 0.01) 
-                return;
+            transform.rotation = Quaternion.LookRotation(xzMove);
         }
-
-        function GetSpeed () {
-            return moveSpeed;
-        }
-
-        function IsJumping () {
-            return jumping;
-        }
-
-        function IsGrounded () {
-            return (collisionFlags & CollisionFlags.CollidedBelow) != 0;
-        }
-
-        function GetDirection () {
-            return moveDirection;
-        }
-
-        function IsMovingBackwards () {
-            return movingBack;
-        }
-
-        function GetLockCameraTimer () 
+    }	
+	
+    // We are in jump mode but just became grounded
+    if (IsGrounded())
+    {
+        lastGroundedTime = Time.time;
+        inAirVelocity = Vector3.zero;
+        if (jumping)
         {
-            return lockCameraTimer;
+            jumping = false;
+            SendMessage("DidLand", SendMessageOptions.DontRequireReceiver);
         }
+    }
+}
 
-        function IsMoving ()  : boolean
-            {
-                return Mathf.Abs(Input.GetAxisRaw("Vertical")) + Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0.5;
-            }
+function OnControllerColliderHit (hit : ControllerColliderHit )
+{
+    //	Debug.DrawRay(hit.point, hit.normal);
+    if (hit.moveDirection.y > 0.01) 
+        return;
+}
 
-            function HasJumpReachedApex ()
-            {
-                return jumpingReachedApex;
-            }
+function GetSpeed () {
+    return moveSpeed;
+}
 
-            function IsGroundedWithTimeout ()
-            {
-                return lastGroundedTime + groundedTimeout > Time.time;
-            }
+function IsJumping () {
+    return jumping;
+}
 
-            function Reset ()
-            {
-                gameObject.tag = "Player";
-            }
+function IsGrounded () {
+    return (collisionFlags & CollisionFlags.CollidedBelow) != 0;
+}
+
+function GetDirection () {
+    return moveDirection;
+}
+
+function IsMovingBackwards () {
+    return movingBack;
+}
+
+function GetLockCameraTimer () 
+{
+    return lockCameraTimer;
+}
+
+function IsMoving ()  : boolean
+{
+    return Mathf.Abs(Input.GetAxisRaw("Vertical")) + Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0.5;
+}
+
+function HasJumpReachedApex ()
+{
+    return jumpingReachedApex;
+}
+
+function IsGroundedWithTimeout ()
+{
+    return lastGroundedTime + groundedTimeout > Time.time;
+}
+
+function Reset ()
+{
+    gameObject.tag = "Player";
+}
 
