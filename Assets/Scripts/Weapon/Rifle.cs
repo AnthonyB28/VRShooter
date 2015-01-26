@@ -18,6 +18,10 @@ public class Rifle : WeaponBase
 
     public override void Update()
     {
+        Transform spawn = m_Weapon.transform.GetChild(0);
+
+        Ray ray = Camera.main.ScreenPointToRay(Camera.main.transform.GetComponent<Crosshair>().GetRandomSpread());
+        Debug.DrawRay(spawn.position, ray.direction, Color.red);
         if(m_IsFiring)
         {
             m_RateOfFireCurrent += Time.deltaTime;
@@ -58,7 +62,22 @@ public class Rifle : WeaponBase
     public override void SpawnProjectile()
     {
         Transform spawn = m_Weapon.transform.GetChild(0);
-        GameObject.Instantiate(m_Projectile, spawn.position, Camera.main.transform.rotation);
+
+        Ray ray = Camera.main.ScreenPointToRay(Camera.main.transform.GetComponent<Crosshair>().GetRandomSpread());
+        Debug.DrawRay(spawn.position, ray.direction, Color.red);
+        RaycastHit hit;
+        Vector3 lookPoint;
+        float distance = 40f;
+        if (Physics.Raycast(ray,out hit))
+        {
+            lookPoint = hit.point;
+        }
+        else
+        {
+            lookPoint = ray.GetPoint(distance);
+        }
+        GameObject projectile = (GameObject) GameObject.Instantiate(m_Projectile, spawn.position, Camera.main.transform.rotation);
+        projectile.transform.LookAt(lookPoint);
     }
 
     public override void Reload()

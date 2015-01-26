@@ -11,16 +11,11 @@ public class Crosshair : MonoBehaviour
     float width = 1;      //Crosshair width
     float height = 5;     //Crosshair height
 
-    class Spread
-    {
-        public float spread = 1.0f;          //Adjust this for a bigger or smaller crosshair
-        public float maxSpread = 10.0f;
-        public float minSpread = 3.0f;
-        public float spreadPerSecond = 30.0f;
-        public float decreasePerSecond = 25.0f;
-    }
-
-    Spread spread = new Spread();
+    public float spread = 3.0f;          //Adjust this for a bigger or smaller crosshair
+    public float maxSpread = 13.0f;
+    public float minSpread = 3.0f;
+    public float spreadPerSecond = 30.0f;
+    public float decreasePerSecond = 25.0f;
 
     Texture2D tex;
 
@@ -40,15 +35,14 @@ public class Crosshair : MonoBehaviour
     {
         if (Input.GetButton("Fire1"))
         {
-            spread.spread += spread.spreadPerSecond * Time.deltaTime;       //Incremente the spread
-            Fire();
+            spread += spreadPerSecond * Time.deltaTime;       //Incremente the spread
         }
         else
         {
-            spread.spread -= spread.decreasePerSecond * Time.deltaTime;      //Decrement the spread        
+            spread -= decreasePerSecond * Time.deltaTime;      //Decrement the spread        
         }
 
-        spread.spread = Mathf.Clamp(spread.spread, spread.minSpread, spread.maxSpread);
+        spread = Mathf.Clamp(spread, minSpread, maxSpread);
     }
 
     void OnGUI()
@@ -57,16 +51,23 @@ public class Crosshair : MonoBehaviour
 
         if (drawCrosshair)
         {
-            GUI.Box(new Rect(centerPoint.x - width / 2, centerPoint.y - (height + spread.spread), width, height), "", lineStyle);
-            GUI.Box(new Rect(centerPoint.x - width / 2, centerPoint.y + spread.spread, width, height), "", lineStyle);
-            GUI.Box(new Rect(centerPoint.x + spread.spread, (centerPoint.y - width / 2), height, width), "", lineStyle);
-            GUI.Box(new Rect(centerPoint.x - (height + spread.spread), (centerPoint.y - width / 2), height, width), "", lineStyle);
+            GUI.Box(new Rect(centerPoint.x - width / 2, centerPoint.y - (height + spread), width, height), "", lineStyle);
+            GUI.Box(new Rect(centerPoint.x - width / 2, centerPoint.y + spread, width, height), "", lineStyle);
+            GUI.Box(new Rect(centerPoint.x + spread, (centerPoint.y - width / 2), height, width), "", lineStyle);
+            GUI.Box(new Rect(centerPoint.x - (height + spread), (centerPoint.y - width / 2), height, width), "", lineStyle);
         }
     }
 
-    void Fire()
+    public Vector3 GetRandomSpread()
     {
-        //Carry out your normal shooting and stuff
+//         float spreadMod = spread / 4;
+//         float randomNumberX = Random.Range(-spreadMod, spreadMod);
+//         float randomNumberY = Random.Range(-spreadMod, spreadMod);
+//         float randomNumberZ = Random.Range(-spreadMod, spreadMod);
+//         return new Vector3(randomNumberX, randomNumberY, randomNumberZ);
+
+       Vector2 center = new Vector3(Screen.width / 2, Screen.height / 2);
+       return center + Random.insideUnitCircle * spread / 2.0f;
     }
 
     //Applies color to the crosshair
