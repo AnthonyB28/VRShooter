@@ -19,7 +19,6 @@ public class Rifle : WeaponBase
     public override void Update()
     {
         Transform spawn = m_Weapon.transform.GetChild(0);
-
         Ray ray = Camera.main.ScreenPointToRay(Camera.main.transform.GetComponent<Crosshair>().GetRandomSpread());
         Debug.DrawRay(spawn.position, ray.direction, Color.red);
         if(m_IsFiring)

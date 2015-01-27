@@ -7,7 +7,10 @@ public class WeaponSystem : MonoBehaviour
     public bool m_Rifle;
     public GameObject m_RifleObject;
     public GameObject m_RifleProjectile;
-    //public GameObject m_WeaponSpawn;
+
+    public bool m_MachineGun;
+    public GameObject m_MachineGunObject;
+    public GameObject m_MachineGunProjectile;
 
     private List<WeaponBase> m_ActiveWeapons;
     private WeaponBase m_SelectedWeapon;
@@ -19,6 +22,11 @@ public class WeaponSystem : MonoBehaviour
         if (m_Rifle)
         {
             m_ActiveWeapons.Add(new Rifle(m_RifleObject, m_RifleProjectile));
+        }
+
+        if(m_MachineGun)
+        {
+            m_ActiveWeapons.Add(new MachineGun(m_MachineGunObject, m_MachineGunProjectile));
         }
 
         if (m_ActiveWeapons.Count > 0)
