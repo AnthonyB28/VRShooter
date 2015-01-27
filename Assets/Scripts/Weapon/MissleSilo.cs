@@ -5,21 +5,23 @@ public class MissleSilo : WeaponBase
 {
 
     private Dictionary<int, GameObject> m_Targets;
+    private bool m_Secondary;
     private bool m_IsTargeting;
 
     // Use this for initialization
-    public MissleSilo(GameObject weapon, GameObject projectile)
+    public MissleSilo(GameObject weapon, GameObject projectile, bool secondary)
     {
         m_Targets = new Dictionary<int, GameObject>();
         m_Weapon = weapon;
         m_Projectile = projectile;
-        m_AmmoClipMax = 50;
+        m_AmmoClipMax = 6;
         m_AmmoClipCurrent = m_AmmoClipMax;
         m_AmmoReserveMax = 60;
         m_AmmoReserveCurrent = m_AmmoReserveMax;
         m_RateOfFire = 0f; // Not used here.
         m_ReloadTime = 6f;
         m_IsTargeting = false;
+        m_Secondary = secondary;
     }
 
     public override void Update()
@@ -36,7 +38,8 @@ public class MissleSilo : WeaponBase
 
         if (!m_IsReloading && !m_IsFiring && m_IsTargeting)
         {
-            if (Input.GetButtonUp("Fire1"))
+            bool fired = m_Secondary ? Input.GetButtonUp("Fire2") : Input.GetButtonUp("Fire1");
+            if (fired)
             {
                 m_IsTargeting = false;
                 m_IsFiring = true;
@@ -60,7 +63,7 @@ public class MissleSilo : WeaponBase
         if (!m_IsFiring)
         {
             m_IsTargeting = true;
-            if (m_Targets.Count <= m_AmmoClipCurrent)
+            if (m_Targets.Count < m_AmmoClipCurrent)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Camera.main.transform.GetComponent<Crosshair>().GetRandomSpread());
                 RaycastHit hit;
@@ -89,8 +92,7 @@ public class MissleSilo : WeaponBase
         {
             Transform spawn = m_Weapon.transform.GetChild(0);
             GameObject projectile = (GameObject)GameObject.Instantiate(m_Projectile, spawn.position, Camera.main.transform.rotation);
-            projectile.GetComponent<Projectile>().SetTarget(target);
-            projectile.transform.LookAt(target.transform.position);
+            projectile.GetComponent<Missile>().SetTarget(target);
         }
     }
 

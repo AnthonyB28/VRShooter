@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class WeaponSystem : MonoBehaviour
 {
-
+    public bool m_Secondary;
     public bool m_Rifle;
     public GameObject m_RifleObject;
     public GameObject m_RifleProjectile;
@@ -35,7 +35,7 @@ public class WeaponSystem : MonoBehaviour
 
         if(m_MissileSilo)
         {
-            m_ActiveWeapons.Add(new MissleSilo(m_MissileSiloObject, m_MissileSiloProjectile));
+            m_ActiveWeapons.Add(new MissleSilo(m_MissileSiloObject, m_MissileSiloProjectile, m_Secondary));
         }
 
         if (m_ActiveWeapons.Count > 0)
@@ -47,9 +47,11 @@ public class WeaponSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool fired = m_Secondary ? Input.GetButton("Fire2") : Input.GetButton("Fire1");
+
         m_SelectedWeapon.Update();
 
-        if (Input.GetButton("Fire1"))
+        if (fired)
         {
             m_SelectedWeapon.Fire();
         }
