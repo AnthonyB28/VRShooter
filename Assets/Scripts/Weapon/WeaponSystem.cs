@@ -12,6 +12,10 @@ public class WeaponSystem : MonoBehaviour
     public GameObject m_MachineGunObject;
     public GameObject m_MachineGunProjectile;
 
+    public bool m_MissileSilo;
+    public GameObject m_MissileSiloObject;
+    public GameObject m_MissileSiloProjectile;
+
     private List<WeaponBase> m_ActiveWeapons;
     private WeaponBase m_SelectedWeapon;
 
@@ -27,6 +31,11 @@ public class WeaponSystem : MonoBehaviour
         if(m_MachineGun)
         {
             m_ActiveWeapons.Add(new MachineGun(m_MachineGunObject, m_MachineGunProjectile));
+        }
+
+        if(m_MissileSilo)
+        {
+            m_ActiveWeapons.Add(new MissleSilo(m_MissileSiloObject, m_MissileSiloProjectile));
         }
 
         if (m_ActiveWeapons.Count > 0)

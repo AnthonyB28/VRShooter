@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MachineGun : Rifle {
+public class MachineGun : Rifle
+{
 
     public MachineGun(GameObject weapon, GameObject projectile)
         : base(weapon, projectile)
