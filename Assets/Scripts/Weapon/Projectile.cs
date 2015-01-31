@@ -50,6 +50,10 @@ public class Projectile : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.tag == "Enemy")
+        {
+            collision.gameObject.GetComponent<Enemy>().ProjectileCollision();
+        }
         Destroy(gameObject);
     }
 }
