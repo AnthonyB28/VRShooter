@@ -197,16 +197,10 @@ function Apply ()
 
     var xQuaternion = Quaternion.AngleAxis (rotationX, Vector3.up);
     var yQuaternion = Quaternion.AngleAxis (rotationY, Vector3.left);
-    var yQuaternionHead = Quaternion.AngleAxis (rotationY, Vector3.up);
-    var zQuaternionHead = Quaternion.AngleAxis (headRotationX, Vector3.forward);
-    var oldRotationX : float = rotationX;
     rotationX += Input.GetAxis("Mouse X") * sensitivityX;
     rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
-    headRotationX += Input.GetAxis("Mouse X") * sensitivityX;
     rotationY = ClampAngle (rotationY, minimumY, maximumY);
-    //rotationX = ClampAngle (rotationX, newMinX, newMaxX);
     rotationX = ClampAngle (rotationX, newMinX, newMaxX);
-    headRotationX = ClampAngle(headRotationX, -bodyRange, bodyRange);
 
     if (axes == RotationAxes.MouseXAndY) {
         cameraTransform.localRotation = originalRotation * xQuaternion * yQuaternion;
