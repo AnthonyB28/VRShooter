@@ -101,7 +101,7 @@ public class MissleSilo : WeaponBase
         if (target)
         {
             Transform spawn = m_Weapon.transform.GetChild(0);
-            GameObject projectile = (GameObject)GameObject.Instantiate(m_Projectile, spawn.position, Camera.main.transform.rotation);
+            GameObject projectile = (GameObject)GameObject.Instantiate(m_Projectile, spawn.position, Quaternion.identity);
             projectile.GetComponent<Missile>().SetTarget(target);
         }
     }
