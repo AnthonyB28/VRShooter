@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Projectile : MonoBehaviour
 {
+    public uint m_Damage = 50;
     public float m_Speed = 0.4f;
     public float m_DestroySeconds = 10f;
     public bool m_Homing = false;
@@ -52,7 +53,7 @@ public class Projectile : MonoBehaviour
     {
         if (collision.gameObject.tag == "Enemy")
         {
-            collision.gameObject.GetComponent<Enemy>().ProjectileCollision();
+            collision.gameObject.GetComponent<Enemy>().ProjectileCollision(m_Damage);
         }
         Destroy(gameObject);
     }

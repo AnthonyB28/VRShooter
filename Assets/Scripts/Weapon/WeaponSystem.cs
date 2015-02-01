@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class WeaponSystem : MonoBehaviour
 {
     public bool m_Secondary;
+    public Text m_WeaponTitle;
+    public Text m_AmmoCurrent;
+    public Text m_AmmoReserve;
     public bool m_Rifle;
     public GameObject m_RifleObject;
     public GameObject m_RifleProjectile;
@@ -25,17 +29,17 @@ public class WeaponSystem : MonoBehaviour
         m_ActiveWeapons = new List<WeaponBase>();
         if (m_Rifle)
         {
-            m_ActiveWeapons.Add(new Rifle(m_RifleObject, m_RifleProjectile));
+            m_ActiveWeapons.Add(new Rifle(m_RifleObject, m_RifleProjectile, this));
         }
 
         if(m_MachineGun)
         {
-            m_ActiveWeapons.Add(new MachineGun(m_MachineGunObject, m_MachineGunProjectile));
+            m_ActiveWeapons.Add(new MachineGun(m_MachineGunObject, m_MachineGunProjectile, this));
         }
 
         if(m_MissileSilo)
         {
-            m_ActiveWeapons.Add(new MissleSilo(m_MissileSiloObject, m_MissileSiloProjectile, m_Secondary));
+            m_ActiveWeapons.Add(new MissleSilo(m_MissileSiloObject, m_MissileSiloProjectile, m_Secondary, this));
         }
 
         if (m_ActiveWeapons.Count > 0)
@@ -61,6 +65,22 @@ public class WeaponSystem : MonoBehaviour
         }
     }
 
+    public void UpdateAmmoClipCurr(int ammo)
+    {
+        if(m_AmmoCurrent)
+        {
+            m_AmmoCurrent.text = ammo.ToString();
+        }
+    }
+
+    public void UpdateAmmoReserveCurr(int ammo)
+    {
+        if (m_AmmoReserve)
+        {
+            m_AmmoReserve.text = ammo.ToString();
+        }
+    }
+
     void SelectWeapon(WeaponBase weapon)
     {
         if(m_SelectedWeapon != null)
@@ -68,6 +88,10 @@ public class WeaponSystem : MonoBehaviour
             m_SelectedWeapon.SetSelected(false);
         }
         m_SelectedWeapon = weapon;
+        if(m_WeaponTitle)
+        {
+            m_WeaponTitle.text = weapon.m_Name;
+        }
         weapon.SetSelected(true);
     }
 }

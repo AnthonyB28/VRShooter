@@ -4,12 +4,44 @@ using System.Collections;
 public abstract class WeaponBase
 {
     public GameObject m_Weapon;
-
+    public string m_Name;
+    protected WeaponSystem m_WeaponSystem;
     protected GameObject m_Projectile;
-    protected int m_AmmoReserveCurrent;
+
     protected int m_AmmoReserveMax;
+    private int _AmmoReserveCurrent;
+    protected int m_AmmoReserveCurrent
+    {
+        get
+        {
+            return _AmmoReserveCurrent;
+        }
+        set
+        {
+            _AmmoReserveCurrent = value;
+            if(m_WeaponSystem)
+            {
+                m_WeaponSystem.UpdateAmmoReserveCurr(value);
+            }
+        }
+    }
     protected int m_AmmoClipMax;
-    protected int m_AmmoClipCurrent;
+    private int _AmmoClipCurrent;
+    protected int m_AmmoClipCurrent
+    {
+        get
+        {
+            return _AmmoClipCurrent;
+        }
+        set
+        {
+            _AmmoClipCurrent = value;
+            if (m_WeaponSystem)
+            {
+                m_WeaponSystem.UpdateAmmoClipCurr(value);
+            }
+        }
+    }
     protected float m_RateOfFire;
     protected float m_RateOfFireCurrent = 0;
     protected float m_ReloadTime;

@@ -4,8 +4,10 @@ using System.Collections;
 public class Rifle : WeaponBase
 {
 
-    public Rifle(GameObject weapon, GameObject projectile)
+    public Rifle(GameObject weapon, GameObject projectile, WeaponSystem sys)
     {
+        m_Name = "Rifle";
+        m_WeaponSystem = sys;
         m_Weapon = weapon;
         m_Projectile = projectile;
         m_AmmoClipMax = 7;

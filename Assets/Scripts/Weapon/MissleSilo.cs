@@ -9,8 +9,10 @@ public class MissleSilo : WeaponBase
     private bool m_IsTargeting;
 
     // Use this for initialization
-    public MissleSilo(GameObject weapon, GameObject projectile, bool secondary)
+    public MissleSilo(GameObject weapon, GameObject projectile, bool secondary, WeaponSystem sys)
     {
+        m_Name = "Missles";
+        m_WeaponSystem = sys;
         m_Targets = new Dictionary<int, GameObject>();
         m_Weapon = weapon;
         m_Projectile = projectile;
@@ -47,6 +49,7 @@ public class MissleSilo : WeaponBase
                 {
                     foreach (GameObject target in m_Targets.Values)
                     {
+                        target.renderer.material.color = Color.white;
                         --m_AmmoClipCurrent;
                         SpawnProjectile(target);
                     }

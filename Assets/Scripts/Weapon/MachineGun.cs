@@ -4,9 +4,10 @@ using System.Collections;
 public class MachineGun : Rifle
 {
 
-    public MachineGun(GameObject weapon, GameObject projectile)
-        : base(weapon, projectile)
+    public MachineGun(GameObject weapon, GameObject projectile, WeaponSystem sys)
+        : base(weapon, projectile, sys)
     {
+        m_Name = "Gatling Gun";
         m_AmmoClipMax = 30;
         m_AmmoClipCurrent = m_AmmoClipMax;
         m_AmmoReserveMax = 90;

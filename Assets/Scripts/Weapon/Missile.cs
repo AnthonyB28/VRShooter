@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Missile : MonoBehaviour
 {
+    public uint m_Damage = 75;
     public float m_HeightBeforeFire = 2f;
     public float m_Speed = 0.4f;
     public float m_DestroySeconds = 10f;
@@ -75,7 +76,7 @@ public class Missile : MonoBehaviour
     {
         if (collision.gameObject.tag == "Enemy")
         {
-            collision.gameObject.GetComponent<Enemy>().ProjectileCollision();
+            collision.gameObject.GetComponent<Enemy>().ProjectileCollision(m_Damage);
         }
         Destroy(gameObject);
     }
