@@ -16,7 +16,7 @@ public class MissleSilo : WeaponBase
         m_Targets = new Dictionary<int, GameObject>();
         m_Weapon = weapon;
         m_Projectile = projectile;
-        m_AmmoClipMax = 6;
+        m_AmmoClipMax = 12;
         m_AmmoClipCurrent = m_AmmoClipMax;
         m_AmmoReserveMax = 60;
         m_AmmoReserveCurrent = m_AmmoReserveMax;
@@ -56,9 +56,12 @@ public class MissleSilo : WeaponBase
                 {
                     foreach (GameObject target in m_Targets.Values)
                     {
-                        target.renderer.material.color = Color.white;
-                        --m_AmmoClipCurrent;
-                        SpawnProjectile(target);
+                        if (target)
+                        {
+                            target.renderer.material.color = Color.white;
+                            --m_AmmoClipCurrent;
+                            SpawnProjectile(target);
+                        }
                     }
                     m_Targets.Clear();
                 }

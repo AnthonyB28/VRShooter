@@ -41,7 +41,7 @@ public class Missile : MonoBehaviour
         {
             if (!m_Climbing)
             {
-                if (m_Homing)
+                if (m_Homing && m_Target)
                 {
                     this.gameObject.transform.LookAt(m_Target.transform);
                     if (Time.time - m_StartTime >= m_MissleSpeedUpTime)

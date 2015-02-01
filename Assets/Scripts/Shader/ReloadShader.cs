@@ -17,7 +17,6 @@ public class ReloadShader : MonoBehaviour
     // Update is called once per frame
     public void ChangeCircle(float value)
     {
-        Debug.Log(value);
         if (value > m_LastValue)
         {
             m_LastValue = value;

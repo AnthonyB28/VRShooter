@@ -80,5 +80,7 @@ public abstract class WeaponBase
     public virtual void SetSelected(bool select)
     {
         m_IsSelected = select;
+        m_AmmoClipCurrent = m_AmmoClipCurrent;
+        m_AmmoReserveCurrent = m_AmmoReserveCurrent;
     }
 }

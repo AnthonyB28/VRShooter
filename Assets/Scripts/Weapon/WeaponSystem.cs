@@ -23,6 +23,7 @@ public class WeaponSystem : MonoBehaviour
 
     private List<WeaponBase> m_ActiveWeapons;
     private WeaponBase m_SelectedWeapon;
+    private int m_SelectedWeaponIndex = 0;
 
     // Use this for initialization
     void Start()
@@ -52,6 +53,28 @@ public class WeaponSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (!m_Secondary)
+        {
+            if (scroll > 0)
+            {
+                ++m_SelectedWeaponIndex;
+                if(m_SelectedWeaponIndex == m_ActiveWeapons.Count)
+                {
+                    m_SelectedWeaponIndex = 0;
+                }
+                SelectWeapon(m_ActiveWeapons[m_SelectedWeaponIndex]);
+            }
+            else if (scroll < 0)
+            {
+                --m_SelectedWeaponIndex;
+                if (m_SelectedWeaponIndex == 0)
+                {
+                    m_SelectedWeaponIndex = m_ActiveWeapons.Count-1;
+                }
+                SelectWeapon(m_ActiveWeapons[m_SelectedWeaponIndex]);
+            }
+        }
         bool fired = m_Secondary ? Input.GetButton("Fire2") : Input.GetButton("Fire1");
 
         m_SelectedWeapon.Update();
@@ -93,6 +116,7 @@ public class WeaponSystem : MonoBehaviour
         {
             m_WeaponTitle.text = weapon.m_Name;
         }
+        UpdateReloadingTimeCurr(1f, 1f);
         weapon.SetSelected(true);
     }
 
