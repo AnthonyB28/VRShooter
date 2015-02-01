@@ -10,9 +10,9 @@ public class Rifle : WeaponBase
         m_WeaponSystem = sys;
         m_Weapon = weapon;
         m_Projectile = projectile;
-        m_AmmoClipMax = 7;
+        m_AmmoClipMax = 14;
         m_AmmoClipCurrent = m_AmmoClipMax;
-        m_AmmoReserveMax = 21;
+        m_AmmoReserveMax = 42;
         m_AmmoReserveCurrent = m_AmmoReserveMax;
         m_RateOfFire = 0.5f;
         m_ReloadTime = 2.8f;
@@ -22,7 +22,6 @@ public class Rifle : WeaponBase
     {
         Transform spawn = m_Weapon.transform.GetChild(0);
         Ray ray = Camera.main.ScreenPointToRay(Camera.main.transform.GetComponent<Crosshair>().GetRandomSpread());
-        Debug.DrawRay(spawn.position, ray.direction, Color.red);
         if(m_IsFiring)
         {
             m_RateOfFireCurrent += Time.deltaTime;
