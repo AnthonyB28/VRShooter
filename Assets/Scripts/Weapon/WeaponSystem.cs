@@ -8,6 +8,7 @@ public class WeaponSystem : MonoBehaviour
     public Text m_WeaponTitle;
     public Text m_AmmoCurrent;
     public Text m_AmmoReserve;
+    public Image m_ReloadCircle;
     public bool m_Rifle;
     public GameObject m_RifleObject;
     public GameObject m_RifleProjectile;
@@ -94,4 +95,13 @@ public class WeaponSystem : MonoBehaviour
         }
         weapon.SetSelected(true);
     }
+
+    public void UpdateReloadingTimeCurr(float time, float max)
+    {
+        if(m_ReloadCircle)
+        {
+            m_ReloadCircle.GetComponent<ReloadShader>().ChangeCircle(1-(time / max));
+        }
+    }
+
 }

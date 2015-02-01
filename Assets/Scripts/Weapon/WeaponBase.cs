@@ -45,15 +45,37 @@ public abstract class WeaponBase
     protected float m_RateOfFire;
     protected float m_RateOfFireCurrent = 0;
     protected float m_ReloadTime;
-    protected float m_ReloadTimeCurrent = 0;
+    private float _ReloadTimeCurrent = 0;
+    protected float m_ReloadTimeCurrent
+    {
+        get
+        {
+            return _ReloadTimeCurrent;
+        }
+        set
+        {
+            _ReloadTimeCurrent = value;
+            if(m_WeaponSystem)
+            {
+                m_WeaponSystem.UpdateReloadingTimeCurr(value, m_ReloadTime);
+            }
+        }
+    }
     protected bool m_IsSelected = false;
     protected bool m_IsReloading = false;
     protected bool m_IsFiring = false;
 
     abstract public void Update(); // To be called from WeaponSystem if selected
     abstract public void Fire();
-    abstract public void Reload();
     abstract public void SpawnProjectile();
+
+    virtual public void Reload()
+    {
+        if (!m_IsReloading && m_AmmoClipCurrent != m_AmmoClipMax && m_AmmoReserveCurrent > 0)
+        {
+            m_IsReloading = true;
+        }
+    }
 
     public virtual void SetSelected(bool select)
     {

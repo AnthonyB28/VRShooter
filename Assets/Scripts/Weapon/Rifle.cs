@@ -37,6 +37,13 @@ public class Rifle : WeaponBase
             m_ReloadTimeCurrent += Time.deltaTime;
             if(m_ReloadTimeCurrent >= m_ReloadTime)
             {
+                int deficit = m_AmmoClipMax - m_AmmoClipCurrent;
+                while (deficit > 0 && m_AmmoReserveCurrent > 0)
+                {
+                    ++m_AmmoClipCurrent;
+                    --m_AmmoReserveCurrent;
+                    --deficit;
+                }
                 m_IsReloading = false;
                 m_ReloadTimeCurrent = 0;
             }
@@ -79,20 +86,5 @@ public class Rifle : WeaponBase
         }
         GameObject projectile = (GameObject) GameObject.Instantiate(m_Projectile, spawn.position, Camera.main.transform.rotation);
         projectile.transform.LookAt(lookPoint);
-    }
-
-    public override void Reload()
-    {
-        if(!m_IsReloading && m_AmmoClipCurrent != m_AmmoClipMax && m_AmmoReserveCurrent > 0)
-        {
-            m_IsReloading = true;
-            int deficit = m_AmmoClipMax - m_AmmoClipCurrent;
-            while(deficit > 0 && m_AmmoReserveCurrent > 0)
-            {
-                ++m_AmmoClipCurrent;
-                --m_AmmoReserveCurrent;
-                --deficit;
-            }
-        }
     }
 }
