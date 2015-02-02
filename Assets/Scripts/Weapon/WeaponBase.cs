@@ -80,6 +80,8 @@ public abstract class WeaponBase
     public virtual void SetSelected(bool select)
     {
         m_IsSelected = select;
+
+        // Trick the UI into updating with the new weapon
         m_AmmoClipCurrent = m_AmmoClipCurrent;
         m_AmmoReserveCurrent = m_AmmoReserveCurrent;
     }

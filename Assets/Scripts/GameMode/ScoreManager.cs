@@ -42,5 +42,6 @@ public class ScoreManager : MonoBehaviour
     {
         m_Score += score;
         m_GUIScore.text = "Score: " + m_Score.ToString();
+        gameObject.GetComponentInChildren<EnemySpawn>().DestroyedEnemy();
     }
 }

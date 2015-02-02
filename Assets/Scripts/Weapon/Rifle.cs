@@ -20,8 +20,6 @@ public class Rifle : WeaponBase
 
     public override void Update()
     {
-        Transform spawn = m_Weapon.transform.GetChild(0);
-        Ray ray = Camera.main.ScreenPointToRay(Camera.main.transform.GetComponent<Crosshair>().GetRandomSpread());
         if(m_IsFiring)
         {
             m_RateOfFireCurrent += Time.deltaTime;
