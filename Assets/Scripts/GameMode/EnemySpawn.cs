@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
 
 public class EnemySpawn : MonoBehaviour
 {
 
+    public Image m_AlertGUIBar;
     public List<GameObject> m_SpawnPoints;
     public List<int> m_Rounds;
     public List<int> m_RoundDeviation;
@@ -21,7 +23,7 @@ public class EnemySpawn : MonoBehaviour
         {
             sphere.renderer.enabled = false;
         }
-
+        m_AlertGUIBar.enabled = false;
         InitiateSpawnRound(m_Rounds[m_CurRound], m_RoundDeviation[m_CurRound]);
     }
 
@@ -43,10 +45,11 @@ public class EnemySpawn : MonoBehaviour
 
         for(int i = 0; i < deviation; ++i)
         {
-            // Spawn a bunch of enemies at our first spawn
+            Vector3 spawnPosition = m_SpawnPoints[spawns[i]].transform.position;
+            DisplayAlert(spawnPosition);
             for (int x = 0; x < spawnGroupCount; ++x)
             {
-                SpawnEnemyInSphere(m_SpawnPoints[spawns[i]].transform.position);
+                SpawnEnemyInSphere(spawnPosition);
             }
         }
     }
@@ -55,6 +58,37 @@ public class EnemySpawn : MonoBehaviour
     {
         Vector3 spherePosOffset = Random.insideUnitSphere * m_Radius;
         GameObject.Instantiate(m_Enemy, spherePosOffset + spawnPos, Quaternion.identity);
+    }
+
+    void DisplayAlert(Vector3 enemyPos)
+    {
+        Vector3 relativePoint = Camera.main.transform.InverseTransformPoint(enemyPos);
+        Debug.Log(relativePoint);
+        if (relativePoint.y < 15 && relativePoint.y > -15)
+        {
+            // Adjacent
+            if (relativePoint.x < -10 && relativePoint.z >= relativePoint.x)
+            {
+                Debug.Log("Left");
+            }
+            else if (relativePoint.x > 10 && relativePoint.z <= relativePoint.x)
+            {
+                // right
+                Debug.Log("Right");
+            }
+        }
+        else
+        {
+            // Horizontal
+            if(relativePoint.y < -15)
+            {
+                Debug.Log("Below");
+            }
+            else if(relativePoint.y > 15)
+            {
+                Debug.Log("Above");
+            }
+        }
     }
 
     public void DestroyedEnemy()
