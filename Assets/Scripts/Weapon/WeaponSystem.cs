@@ -68,7 +68,7 @@ public class WeaponSystem : MonoBehaviour
             else if (scroll < 0)
             {
                 --m_SelectedWeaponIndex;
-                if (m_SelectedWeaponIndex == 0)
+                if (m_SelectedWeaponIndex <= 0)
                 {
                     m_SelectedWeaponIndex = m_ActiveWeapons.Count-1;
                 }

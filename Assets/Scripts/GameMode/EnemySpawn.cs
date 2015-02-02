@@ -27,6 +27,7 @@ public class EnemySpawn : MonoBehaviour
 
     void InitiateSpawnRound(int numOfEnemies, int deviation)
     {
+        ScoreManager.Instance.SetEnemyCount((uint)numOfEnemies);
         List<int> spawns = new List<int>();
         for(int i = 0; i < deviation; ++i)
         {
